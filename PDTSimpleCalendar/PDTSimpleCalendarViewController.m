@@ -350,7 +350,16 @@ static NSString *PDTSimpleCalendarViewHeaderIdentifier = @"com.producteev.collec
     if (![self isEnabledDate:cellDate] || isCustomDate) {
         [cell refreshCellColors];
     }
-
+    
+    // if the cell is the first of the row, and the week contains data, display the arrow
+    if ((indexPath.row % self.daysPerWeek) == 0) {
+        NSInteger weekOfYear = [[_calendar components:NSWeekOfYearCalendarUnit fromDate:cellDate] weekOfYear];
+        BOOL isCustomWeek = [_delegate simpleCalendarViewController:self shouldUseCustomColorsForWeek:weekOfYear];
+        cell.displayArrow = isCustomWeek;
+    } else {
+        cell.displayArrow = NO;
+    }
+    
     //We rasterize the cell for performances purposes.
     //The circle background is made using roundedCorner which is a super expensive operation, specially with a lot of items on the screen to display (like we do)
     cell.layer.shouldRasterize = YES;
@@ -405,7 +414,7 @@ static NSString *PDTSimpleCalendarViewHeaderIdentifier = @"com.producteev.collec
 {
     CGFloat itemWidth = floorf(CGRectGetWidth(self.collectionView.bounds) / self.daysPerWeek);
 
-    return CGSizeMake(itemWidth, itemWidth);
+    return CGSizeMake(itemWidth, itemWidth * 0.75);
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -473,10 +482,6 @@ static NSString *PDTSimpleCalendarViewHeaderIdentifier = @"com.producteev.collec
     NSDate *clampedDate = [self clampDate:date toComponents:(NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit)];
     if (([clampedDate compare:self.firstDate] == NSOrderedAscending) || ([clampedDate compare:self.lastDate] == NSOrderedDescending)) {
         return NO;
-    }
-
-    if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:isEnabledDate:)]) {
-        return [self.delegate simpleCalendarViewController:self isEnabledDate:date];
     }
 
     return YES;
@@ -580,7 +585,7 @@ static NSString *PDTSimpleCalendarViewHeaderIdentifier = @"com.producteev.collec
     if ([self.delegate respondsToSelector:@selector(simpleCalendarViewController:textColorForDate:)]) {
         return [self.delegate simpleCalendarViewController:self textColorForDate:date];
     }
-
+    
     return nil;
 }
 

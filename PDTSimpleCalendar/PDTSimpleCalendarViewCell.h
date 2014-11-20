@@ -6,9 +6,6 @@
 //  Copyright (c) 2013 Producteev. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-
 @class PDTSimpleCalendarViewCell;
 
 @protocol PDTSimpleCalendarViewCellDelegate <NSObject>
@@ -69,6 +66,8 @@
  */
 @property (nonatomic, assign) BOOL isToday;
 
+@property (nonatomic, assign) BOOL displayArrow;
+
 /**
  *  Customize the circle behind the day's number color using UIAppearance.
  */
@@ -104,10 +103,9 @@
  */
 @property (nonatomic, strong) UIColor *textDisabledColor UI_APPEARANCE_SELECTOR;
 
-/**
- *  Customize the day's number font using UIAppearance.
- */
-@property (nonatomic, strong) UIFont *textDefaultFont UI_APPEARANCE_SELECTOR;
+
+@property (nonatomic, strong) UIColor *arrowTextColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic, strong) UIColor *arrowBackgroundColor UI_APPEARANCE_SELECTOR;
 
 /**
  * Set the date for this cell

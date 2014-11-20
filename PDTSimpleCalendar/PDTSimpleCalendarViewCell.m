@@ -8,59 +8,34 @@
 
 #import "PDTSimpleCalendarViewCell.h"
 
-const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
+const CGFloat PDTSimpleCalendarCircleSize = 24.0f;
 
 @interface PDTSimpleCalendarViewCell ()
 
 @property (nonatomic, strong) UILabel *dayLabel;
 @property (nonatomic, strong) NSDate *date;
+@property (nonatomic, strong) UILabel *arrowLabel;
 
 @end
 
 @implementation PDTSimpleCalendarViewCell
 
-#pragma mark - Class Methods
+#pragma mark - Class Method
 
 + (NSString *)formatDate:(NSDate *)date withCalendar:(NSCalendar *)calendar
 {
-    NSDateFormatter *dateFormatter = [self dateFormatter];
-    return [PDTSimpleCalendarViewCell stringFromDate:date withDateFormatter:dateFormatter withCalendar:calendar];
-}
-
-+ (NSString *)formatAccessibilityDate:(NSDate *)date withCalendar:(NSCalendar *)calendar
-{
-    NSDateFormatter *dateFormatter = [self accessibilityDateFormatter];
-    return [PDTSimpleCalendarViewCell stringFromDate:date withDateFormatter:dateFormatter withCalendar:calendar];
-}
-
-
-+ (NSDateFormatter *)dateFormatter {
     static NSDateFormatter *dateFormatter;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"d";
     });
-    return dateFormatter;
-}
 
-+ (NSDateFormatter *)accessibilityDateFormatter {
-    static NSDateFormatter *dateFormatter;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateStyle:NSDateFormatterLongStyle];
-        [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-        
-    });
-    return dateFormatter;
-}
-
-+ (NSString *)stringFromDate:(NSDate *)date withDateFormatter:(NSDateFormatter *)dateFormatter withCalendar:(NSCalendar *)calendar {
     //Test if the calendar is different than the current dateFormatter calendar property
     if (![dateFormatter.calendar isEqual:calendar]) {
         dateFormatter.calendar = calendar;
     }
+
     return [dateFormatter stringFromDate:date];
 }
 
@@ -73,7 +48,6 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
         _date = nil;
         _isToday = NO;
         _dayLabel = [[UILabel alloc] init];
-        [self.dayLabel setFont:[self textDefaultFont]];
         [self.dayLabel setTextAlignment:NSTextAlignmentCenter];
         [self.contentView addSubview:self.dayLabel];
 
@@ -82,6 +56,7 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
         [self.dayLabel setBackgroundColor:[UIColor clearColor]];
         self.dayLabel.layer.cornerRadius = PDTSimpleCalendarCircleSize/2;
         self.dayLabel.layer.masksToBounds = YES;
+        [_dayLabel setFont:[UIFont systemFontOfSize:16.f]];
 
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0]];
@@ -89,22 +64,59 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.dayLabel attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:PDTSimpleCalendarCircleSize]];
 
         [self setCircleColor:NO selected:NO];
+        
+        self.arrowLabel = [[UILabel alloc] init];
+        _arrowLabel.text = @"▸";
+        _arrowLabel.textColor = self.arrowTextColor;
+        _arrowLabel.textAlignment = NSTextAlignmentLeft;
+        _arrowLabel.backgroundColor = self.arrowBackgroundColor;
+        _arrowLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.contentView addSubview:_arrowLabel];
+        [self.contentView sendSubviewToBack:_arrowLabel];
+        
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:_arrowLabel
+                                                                     attribute:NSLayoutAttributeCenterX
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.contentView
+                                                                     attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:5.0]];
+
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:_arrowLabel
+                                                                     attribute:NSLayoutAttributeCenterY
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.contentView
+                                                                     attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0]];
+        
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:_arrowLabel
+                                                                     attribute:NSLayoutAttributeHeight
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.contentView
+                                                                     attribute:NSLayoutAttributeHeight multiplier:0.9 constant:0.0]];
+        
+        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:_arrowLabel
+                                                                     attribute:NSLayoutAttributeWidth
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.contentView
+                                                                     attribute:NSLayoutAttributeWidth multiplier:1.2 constant:0.0]];
+        
     }
 
     return self;
 }
 
+- (void)setDisplayArrow:(BOOL)displayArrow
+{
+    _displayArrow = displayArrow;
+    _arrowLabel.textColor = displayArrow?self.arrowTextColor:[UIColor clearColor];
+}
+
 - (void)setDate:(NSDate *)date calendar:(NSCalendar *)calendar
 {
     NSString* day = @"";
-    NSString* accessibilityDay = @"";
     if (date && calendar) {
         _date = date;
-        day = [PDTSimpleCalendarViewCell formatDate:date withCalendar:calendar];
-        accessibilityDay = [PDTSimpleCalendarViewCell formatAccessibilityDate:date withCalendar:calendar];
+         day = [PDTSimpleCalendarViewCell formatDate:date withCalendar:calendar];
     }
     self.dayLabel.text = day;
-    self.dayLabel.accessibilityLabel = accessibilityDay;
 }
 
 - (void)setIsToday:(BOOL)isToday
@@ -137,11 +149,12 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
             }
         }
     }
-    
+    /*
     if (selected) {
         circleColor = [self circleSelectedColor];
         labelColor = [self textSelectedColor];
     }
+    */
 
     [self.dayLabel setBackgroundColor:circleColor];
     [self.dayLabel setTextColor:labelColor];
@@ -261,20 +274,30 @@ const CGFloat PDTSimpleCalendarCircleSize = 32.0f;
     return [UIColor lightGrayColor];
 }
 
-#pragma mark - Text Label Customizations Font
-
-- (UIFont *)textDefaultFont
+- (UIColor *)arrowTextColor
 {
-    if(_textDefaultFont == nil) {
-        _textDefaultFont = [[[self class] appearance] textDefaultFont];
+    if(_arrowTextColor == nil) {
+        _arrowTextColor = [[[self class] appearance] arrowTextColor];
     }
-
-    if (_textDefaultFont != nil) {
-        return _textDefaultFont;
+    
+    if(_arrowTextColor != nil) {
+        return _arrowTextColor;
     }
+    
+    return [UIColor redColor];
+}
 
-    // default system font
-    return [UIFont systemFontOfSize:17.0];
+- (UIColor *)arrowBackgroundColor
+{
+    if(_arrowBackgroundColor == nil) {
+        _arrowBackgroundColor = [[[self class] appearance] arrowBackgroundColor];
+    }
+    
+    if(_arrowBackgroundColor != nil) {
+        return _arrowBackgroundColor;
+    }
+    
+    return [UIColor lightGrayColor];
 }
 
 @end

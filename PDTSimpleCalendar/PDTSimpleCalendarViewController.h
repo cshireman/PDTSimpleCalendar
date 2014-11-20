@@ -102,16 +102,6 @@
 @optional
 
 /**
- *  Asks the delegate if the Calendar may enable selection for the specified date
- *
- *  @param controller the calendarView Controller
- *  @param date       the date (Midnight GMT)
- *
- *  @return YES if the calendar can select the specified date, NO otherwise.
- */
-- (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller isEnabledDate:(NSDate *)date;
-
-/**
  *  Tells the delegate that a date was selected by the user.
  *
  *  @param controller the calendarView Controller
@@ -130,6 +120,7 @@
  *  @return YES if the calendar must ask the delegate for text and circle color, NO if it should use default values.
  */
 - (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldUseCustomColorsForDate:(NSDate *)date;
+- (BOOL)simpleCalendarViewController:(PDTSimpleCalendarViewController *)controller shouldUseCustomColorsForWeek:(NSInteger)week;
 
 /**
  *  Asks the delegate for the circle color for a custom added date

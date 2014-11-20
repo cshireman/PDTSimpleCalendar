@@ -8,7 +8,7 @@
 
 #import "PDTSimpleCalendarViewHeader.h"
 
-const CGFloat PDTSimpleCalendarHeaderTextSize = 12.0f;
+const CGFloat PDTSimpleCalendarHeaderTextSize = 16.0f;
 
 @implementation PDTSimpleCalendarViewHeader
 
@@ -18,7 +18,7 @@ const CGFloat PDTSimpleCalendarHeaderTextSize = 12.0f;
     if (self) {
         // Initialization code
         _titleLabel = [[UILabel alloc] init];
-        [_titleLabel setFont:self.textFont];
+        [_titleLabel setFont:[UIFont systemFontOfSize:PDTSimpleCalendarHeaderTextSize]];
         [_titleLabel setTextColor:self.textColor];
         [_titleLabel setBackgroundColor:[UIColor clearColor]];
 
@@ -30,7 +30,7 @@ const CGFloat PDTSimpleCalendarHeaderTextSize = 12.0f;
         [self addSubview:separatorView];
         [separatorView setTranslatesAutoresizingMaskIntoConstraints:NO];
 
-        CGFloat onePixel = 1.0f / [UIScreen mainScreen].scale;
+        CGFloat onePixel = 1.0f ;/// [UIScreen mainScreen].scale;
         NSDictionary *metricsDictionary = @{@"onePixel" : [NSNumber numberWithFloat:onePixel]};
         NSDictionary *viewsDictionary = @{@"titleLabel" : self.titleLabel, @"separatorView" : separatorView};
 
@@ -58,19 +58,6 @@ const CGFloat PDTSimpleCalendarHeaderTextSize = 12.0f;
     }
 
     return [UIColor grayColor];
-}
-
-- (UIFont *)textFont
-{
-    if(_textFont == nil) {
-        _textFont = [[[self class] appearance] textFont];
-    }
-
-    if(_textFont != nil) {
-        return _textFont;
-    }
-
-    return [UIFont systemFontOfSize:PDTSimpleCalendarHeaderTextSize];
 }
 
 - (UIColor *)separatorColor
