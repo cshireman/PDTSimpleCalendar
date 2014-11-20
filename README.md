@@ -1,5 +1,6 @@
-PDTSimpleCalendar
+HTWMSimpleCalendar
 =================
+Originally based on PDTSImpleCalendat, this variation adds a colored arrow to the left size of the calendar rows.
 
 [![Pod version](https://img.shields.io/cocoapods/v/PDTSimpleCalendar.svg?style=flat)](http://cocoadocs.org/docsets/PDTSimpleCalendar)
 [![Build Status](https://img.shields.io/travis/jivesoftware/PDTSimpleCalendar.svg?style=flat)](https://travis-ci.org/jivesoftware/PDTSimpleCalendar)
